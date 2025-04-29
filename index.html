@@ -1,56 +1,60 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-
-<style>
-    body {
-        font-family: sans-serif;
-        max-width: 800px;
-        margin: auto;
-        padding: 20px;
-    }
-    form {
-        background-color: #f9f9f9;
-        padding: 15px;
-        border-radius: 10px;
-        margin-bottom: 20px;
-    }
-    input, select, button {
-        margin: 5px;
-        padding: 8px;
-        font-size: 16px;
-    }
-    #result div {
-        background-color: #f0f0f0;
-        padding: 15px;
-        margin-bottom: 20px;
-        border-radius: 8px;
-    }
-    img {
-        max-width: 100%;
-        height: auto;
-        border-radius: 5px;
-    }
-    .big-image {
-        width: 1257px;
-        height: auto;
-        display: block;
-        margin-top: 10px;
-        border-radius: 5px;
-    }
-</style>
-
     <meta charset="UTF-8">
     <title>프레시백 미회수 검수 사진 확인</title>
+
+    <style>
+        body {
+            font-family: sans-serif;
+            max-width: 800px;
+            margin: auto;
+            padding: 20px;
+            text-align: center;
+        }
+        form {
+            background-color: #f9f9f9;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        input, select, button {
+            margin: 5px;
+            padding: 8px;
+            font-size: 16px;
+        }
+        #result div {
+            background-color: #f0f0f0;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            text-align: left;
+        }
+        img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 5px;
+        }
+        img.big-image {
+            width: 1257px;
+            height: auto;
+            display: block;
+            margin-top: 10px;
+            border-radius: 5px;
+        }
+    </style>
 </head>
 <body>
 
+<!-- 로고 + 제목 부분 -->
 <div style="text-align: center; margin-bottom: 20px;">
-    <img src="logo.png" alt="회사 로고" style="max-width: 500px; height: auto;">
+    <img src="logo.png" alt="회사 로고" style="max-width: 400px; height: auto;">
 </div>
 
 <h1>프레시백 미회수 검수 사진 확인</h1>
 
+<!-- 검색 폼 부분 -->
 <form id="searchForm">
     <label for="workType">업무형태:</label>
     <select id="workType">
@@ -61,7 +65,6 @@
 
     <label for="camp">캠프:</label>
     <select id="camp">
-        <option value="">선택하세요</option>
         <option value="강서1캠프">강서1캠프</option>
         <option value="광주1캠프">광주1캠프</option>
         <option value="광주2캠프">광주2캠프</option>
@@ -139,7 +142,7 @@
         <option value="천안1캠프">천안1캠프</option>
         <option value="청주1캠프">청주1캠프</option>
         <option value="화성1캠프">화성1캠프</option>
-        <!-- 필요한 캠프명을 추가하면 돼 -->
+        <!-- 필요한 캠프 추가 -->
     </select>
 
     <label for="route">라우트:</label>
@@ -150,8 +153,10 @@
 
 <hr>
 
+<!-- 검색 결과 출력 부분 -->
 <div id="result"></div>
 
+<!-- 검색 스크립트 부분 -->
 <script>
 let data = [];
 
@@ -185,20 +190,17 @@ function search() {
 
     filtered.forEach(item => {
         const entry = document.createElement('div');
-        entry.innerHTML = 
+        entry.innerHTML = `
             <p><strong>업무일자:</strong> ${item.date}</p>
             <p><strong>업무형태:</strong> ${item.workType}</p>
             <p><strong>캠프:</strong> ${item.camp}</p>
             <p><strong>라우트:</strong> ${item.route}</p>
             <img src="${item.photo}" alt="사진" class="big-image">
             <hr>
-        ;
+        `;
         resultDiv.appendChild(entry);
     });
 }
-</script>
-
-
 </script>
 
 </body>
