@@ -2,6 +2,9 @@
 <html lang="ko">
 <head>
 
+<meta charset="UTF-8">
+<title>프레시백 미회수 검수 사진 확인</title>
+
 <style>
     body {
         font-family: sans-serif;
@@ -40,8 +43,6 @@
     }
 </style>
 
-    <meta charset="UTF-8">
-    <title>프레시백 미회수 검수 사진 확인</title>
 </head>
 <body>
 
@@ -139,7 +140,6 @@
         <option value="천안1캠프">천안1캠프</option>
         <option value="청주1캠프">청주1캠프</option>
         <option value="화성1캠프">화성1캠프</option>
-        <!-- 필요한 캠프명을 추가하면 돼 -->
     </select>
 
     <label for="route">라우트:</label>
@@ -183,22 +183,75 @@ function search() {
         return;
     }
 
-    filtered.forEach(item => {
+    filtered.forEach((item, index) => {
         const entry = document.createElement('div');
         entry.innerHTML = `
-            <p><strong>업무일자:</strong> ${item.date}</p>
-            <p><strong>업무형태:</strong> ${item.workType}</p>
-            <p><strong>캠프:</strong> ${item.camp}</p>
-            <p><strong>라우트:</strong> ${item.route}</p>
+            <input type="checkbox" id="check_${index}" onchange="toggleReason(${index})">
+            <label for="check_${index}"><strong>${item.date} | ${item.workType} | ${item.camp} | ${item.route}</strong></label>
+            <br>
             <img src="${item.photo}" alt="사진" class="big-image">
+            <div id="reason_${index}" style="display:none; margin-top:10px;">
+                <textarea placeholder="이의제기 사유 입력" rows="3" style="width:100%;"></textarea>
+            </div>
             <hr>
         `;
         resultDiv.appendChild(entry);
     });
+
+    // 제출 버튼 추가
+    const submitButton = document.createElement('button');
+    submitButton.textContent = "이의제기 제출";
+    submitButton.onclick = submitObjection;
+    submitButton.style.marginTop = "20px";
+    resultDiv.appendChild(submitButton);
 }
-</script>
 
+function toggleReason(index) {
+    const checkbox = document.getElementById(`check_${index}`);
+    const reasonDiv = document.getElementById(`reason_${index}`);
+    reasonDiv.style.display = checkbox.checked ? "block" : "none";
+}
 
+function submitObjection() {
+    const objections = [];
+
+    const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+    checkboxes.forEach((checkbox, index) => {
+        if (checkbox.checked) {
+            const reason = document.querySelector(`#reason_${index} textarea`).value.trim();
+            const label = checkbox.nextElementSibling.textContent.split('|').map(item => item.trim());
+            objections.push({
+                date: label[0],
+                workType: label[1],
+                camp: label[2],
+                route: label[3],
+                reason: reason
+            });
+        }
+    });
+
+    if (objections.length === 0) {
+        alert("이의제기할 항목을 선택해주세요!");
+        return;
+    }
+
+    fetch('https://script.google.com/macros/s/AKfycbyFm6Er8xxj2y06RE_Lp_THSTglpnOu3ZXtcxAdKoWnTljj3zTFYXiraTPbYZMnCIUe/exec', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(objections)
+    })
+    .then(response => response.json())
+    .then(result => {
+        alert("이의제기가 정상적으로 제출되었습니다!");
+        document.getElementById('result').innerHTML = ""; // 제출 후 결과창 비우기
+    })
+    .catch(error => {
+        console.error("이의제기 제출 실패:", error);
+        alert("제출 중 오류가 발생했습니다. 다시 시도해주세요.");
+    });
+}
 </script>
 
 </body>
