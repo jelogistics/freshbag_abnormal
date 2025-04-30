@@ -43,7 +43,11 @@
             margin-top: 10px;
             border-radius: 5px;
         }
-    </style>
+    .appealBox {
+      display: none;
+      margin-top: 10px;
+    }
+  </style>
 </head>
 <body>
 
@@ -65,6 +69,7 @@
 
     <label for="camp">캠프:</label>
     <select id="camp">
+        <option value="">선택하세요</option>
         <option value="강서1캠프">강서1캠프</option>
         <option value="광주1캠프">광주1캠프</option>
         <option value="광주2캠프">광주2캠프</option>
@@ -146,62 +151,135 @@
     </select>
 
     <label for="route">라우트:</label>
-    <input type="text" id="route" placeholder="라우트 입력">
+    <input type="text" id="route" placeholder="라우트 입력 (예: 999Z)">
 
     <button type="button" onclick="search()">검색</button>
 </form>
 
 <hr>
 
-<!-- 검색 결과 출력 부분 -->
 <div id="result"></div>
 
-<!-- 검색 스크립트 부분 -->
+<!-- 이의제기 제출 섹션 -->
+<div id="submissionSection" style="display: none;">
+  <input type="text" id="name" placeholder="성함을 입력하세요">
+  <input type="text" id="workId" placeholder="업무 ID를 입력하세요">
+  <button onclick="submitAppeals()">이의제기 제출</button>
+</div>
+
 <script>
 let data = [];
 
 fetch('data_updated.json')
-    .then(response => response.json())
-    .then(json => {
-        data = json;
-    })
-    .catch(error => {
-        console.error("데이터 불러오기 실패:", error);
-    });
+  .then(res => res.json())
+  .then(json => data = json)
+  .catch(err => console.error("데이터 불러오기 실패:", err));
 
 function search() {
-    const workType = document.getElementById('workType').value;
-    const camp = document.getElementById('camp').value;
-    const route = document.getElementById('route').value.trim();
+  const workType = document.getElementById('workType').value;
+  const camp = document.getElementById('camp').value;
+  const route = document.getElementById('route').value.trim();
 
-    const filtered = data.filter(item => 
-        (workType === "" || item.workType === workType) &&
-        (camp === "" || item.camp === camp) &&
-        (route === "" || item.route.includes(route))
-    );
+  const filtered = data.filter(item =>
+    (!workType || item.workType === workType) &&
+    (!camp || item.camp === camp) &&
+    (!route || item.route.includes(route))
+  );
 
-    const resultDiv = document.getElementById('result');
-    resultDiv.innerHTML = "";
+  const resultDiv = document.getElementById('result');
+  resultDiv.innerHTML = "";
+  document.getElementById('submissionSection').style.display = "none";
 
-    if (filtered.length === 0) {
-        resultDiv.innerHTML = "<p>검색 결과가 없습니다.</p>";
+  if (filtered.length === 0) {
+    resultDiv.innerHTML = "<p>검색 결과가 없습니다.</p>";
+    return;
+  }
+
+  filtered.forEach((item, index) => {
+    const div = document.createElement('div');
+    div.innerHTML = `
+      <p><strong>업무일자:</strong> ${item.date}</p>
+      <p><strong>업무형태:</strong> ${item.workType}</p>
+      <p><strong>캠프:</strong> ${item.camp}</p>
+      <p><strong>라우트:</strong> ${item.route}</p>
+      <img src="${item.photo}" alt="사진" class="big-image">
+      <label style="font-size: 18px;">
+        <input type="checkbox" style="transform: scale(1.5); margin-right: 10px;" onchange="toggleAppealBox(${index})" id="appealCheck${index}">
+        <strong>📌 이의제기</strong>
+      </label>
+      <div class="appealBox" id="appealBox${index}">
+        <textarea id="appealText${index}" rows="4" placeholder="이의제기 사유를 입력하세요." style="width: 100%;"></textarea>
+      </div>
+      <hr>
+    `;
+    resultDiv.appendChild(div);
+  });
+}
+
+function toggleAppealBox(index) {
+  const isChecked = document.getElementById(`appealCheck${index}`).checked;
+  const box = document.getElementById(`appealBox${index}`);
+  box.style.display = isChecked ? "block" : "none";
+
+  // 이의제기 영역 표시 여부 결정
+  const anyChecked = Array.from(document.querySelectorAll('input[type="checkbox"]'))
+                          .some(cb => cb.checked);
+  document.getElementById('submissionSection').style.display = anyChecked ? "block" : "none";
+}
+
+function submitAppeals() {
+  const name = document.getElementById('name').value.trim();
+  const workId = document.getElementById('workId').value.trim();
+  const appeals = [];
+
+  data.forEach((item, index) => {
+    const cb = document.getElementById(`appealCheck${index}`);
+    const text = document.getElementById(`appealText${index}`);
+    if (cb && cb.checked) {
+      if (!text || !text.value.trim()) {
+        alert("입력하지 않은 빈 칸이 있습니다");
         return;
+      }
+      appeals.push({
+        date: item.date,
+        workType: item.workType,
+        camp: item.camp,
+        route: item.route,
+        reason: text.value.trim()
+      });
     }
+  });
 
-    filtered.forEach(item => {
-        const entry = document.createElement('div');
-        entry.innerHTML = `
-            <p><strong>업무일자:</strong> ${item.date}</p>
-            <p><strong>업무형태:</strong> ${item.workType}</p>
-            <p><strong>캠프:</strong> ${item.camp}</p>
-            <p><strong>라우트:</strong> ${item.route}</p>
-            <img src="${item.photo}" alt="사진" class="big-image">
-            <hr>
-        `;
-        resultDiv.appendChild(entry);
-    });
+  if (appeals.length === 0 || !name || !workId) {
+    alert("입력하지 않은 빈 칸이 있습니다");
+    return;
+  }
+
+  const payload = {
+    name: name,
+    workId: workId,
+    entries: appeals
+  };
+
+  fetch("https://script.google.com/macros/s/AKfycbw0Evj89dRmqwuqu307-mJRvIDCvLjK3JbyrtGToxfNQ4ttHr2eji27IV5G4nUapytB3Q/exec", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload)
+  }).then(res => {
+    if (res.ok) {
+      alert("이의제기가 접수 되었습니다");
+      document.getElementById('result').innerHTML = "";
+      document.getElementById('submissionSection').style.display = "none";
+      document.getElementById('name').value = "";
+      document.getElementById('workId').value = "";
+    } else {
+      alert("전송 중 오류가 발생했습니다.");
+    }
+  }).catch(err => {
+    console.error(err);
+    alert("서버 오류 발생");
+  });
 }
 </script>
-
 </body>
 </html>
