@@ -264,18 +264,16 @@ function submitAppeals() {
   fetch("https://script.google.com/macros/s/AKfycbw0Evj89dRmqwuqu307-mJRvIDCvLjK3JbyrtGToxfNQ4ttHr2eji27IV5G4nUapytB3Q/exec", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
+    mode: "no-cors",
     body: JSON.stringify(payload)
-  }).then(res => {
-    if (res.ok) {
-      alert("이의제기가 접수 되었습니다");
+  }).then(() => {
+      alert("이의제기 제출이 완료되었습니다.");
       document.getElementById('result').innerHTML = "";
       document.getElementById('submissionSection').style.display = "none";
       document.getElementById('name').value = "";
       document.getElementById('workId').value = "";
-    } else {
-      alert("전송 중 오류가 발생했습니다.");
-    }
-  }).catch(err => {
+    })
+    .catch(err => {
     console.error(err);
     alert("서버 오류 발생");
   });
