@@ -261,24 +261,24 @@ function submitAppeals() {
     entries: appeals
   };
 
-  fetch("https://script.google.com/macros/s/AKfycbxFfFEwS_KqGkVxjnQ1MYND33F4c20brZVd8HYGZzOJ74E0gHkFUM-uiiXS7i881DF6ww/exec", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload)
-  }).then(res => {
-    if (res.ok) {
-      alert("이의제기가 접수 되었습니다");
-      document.getElementById('result').innerHTML = "";
-      document.getElementById('submissionSection').style.display = "none";
-      document.getElementById('name').value = "";
-      document.getElementById('workId').value = "";
-    } else {
-      alert("전송 중 오류가 발생했습니다.");
-    }
-  }).catch(err => {
-    console.error(err);
-    alert("서버 오류 발생");
-  });
+fetch("https://script.google.com/macros/s/AKfycbxFfFEwS_KqGkVxjnQ1MYND33F4c20brZVd8HYGZzOJ74E0gHkFUM-uiiXS7i881DF6ww/exec", {
+  method: "POST",
+  mode: "no-cors", // ⭐️ 핵심 추가
+  headers: {
+    "Content-Type": "application/json"
+  },
+  body: JSON.stringify(payload)
+}).then(() => {
+  // ⭐ no-cors에선 응답 확인이 불가능하므로 그냥 성공 가정
+  alert("이의제기가 전송되었습니다");
+  document.getElementById('result').innerHTML = "";
+  document.getElementById('submissionSection').style.display = "none";
+  document.getElementById('name').value = "";
+  document.getElementById('workId').value = "";
+}).catch(err => {
+  console.error(err);
+  alert("전송 중 오류가 발생했습니다");
+});
 }
 </script>
 </body>
