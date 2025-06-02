@@ -51,7 +51,7 @@
 <body>
 
 <div style="text-align: center; margin-bottom: 20px;">
-  <img src="logo.png" alt="회사 로고" style="max-width: 800px; height: auto;">
+  <img src="logo.png" alt="회사 로고" style="max-width: 400px; height: auto;">
 </div>
 
 <h1>프레시백 미회수 검수 사진 확인</h1>
@@ -154,7 +154,6 @@
 
 <hr>
 <div id="result"></div>
-
 <div id="submissionSection" style="display: none;">
   <input type="text" id="name" placeholder="성함을 입력하세요">
   <input type="text" id="workId" placeholder="업무 ID를 입력하세요">
@@ -166,14 +165,12 @@ let data = [];
 let appealedUNQ = [];
 let searchResults = [];
 
-// 1. 데이터 로드
 fetch('data_updated.json')
   .then(res => res.json())
   .then(json => data = json)
   .catch(err => console.error("데이터 불러오기 실패:", err));
 
-// 2. 이의제기된 목록 가져오기
-fetch("https://script.google.com/macros/s/AKfycbwQRMKPL4VZfZLhimaatZgfc14ngI8jcb2-IjCvoCxWW6X6kxgZmzW6irHiD_sGjzRF3g/exec")
+fetch("https://script.google.com/macros/s/AKfycbyIHLB9Zzr5l-EX4_oFZiiTenmhpvOzrE5us4EQVXMfHKiKITDlMy3AKyjytatdh9WrbA/exec")
   .then(res => res.json())
   .then(json => {
     appealedUNQ = json.appealed || [];
@@ -192,7 +189,6 @@ function search() {
   );
 
   searchResults = filtered;
-  
   const resultDiv = document.getElementById('result');
   resultDiv.innerHTML = "";
   document.getElementById('submissionSection').style.display = "none";
@@ -213,14 +209,14 @@ function search() {
       <p><strong>캠프:</strong> ${item.camp}</p>
       <p><strong>라우트:</strong> ${item.route}</p>
       <img src="${item.photo}" alt="사진" class="big-image">
-      ${appealed ? '<p class="appeal-status">📩 이의제기 접수 완료</p>' : `
+      ${appealed ? '<p class="appeal-status">📩 이의제기 접수 완료</p>' : ''}
       <label style="font-size: 18px;">
         <input type="checkbox" style="transform: scale(1.5); margin-right: 10px;" onchange="toggleAppealBox(${index})" id="appealCheck${index}">
         <strong>📌 이의제기</strong>
       </label>
       <div class="appealBox" id="appealBox${index}">
         <textarea id="appealText${index}" rows="4" placeholder="이의제기 사유를 입력하세요." style="width: 100%;"></textarea>
-      </div>`}
+      </div>
       <hr>
     `;
     resultDiv.appendChild(div);
@@ -272,7 +268,7 @@ function submitAppeals() {
     entries: appeals
   };
 
-  fetch("https://script.google.com/macros/s/AKfycbwQRMKPL4VZfZLhimaatZgfc14ngI8jcb2-IjCvoCxWW6X6kxgZmzW6irHiD_sGjzRF3g/exec", {
+  fetch("https://script.google.com/macros/s/AKfycbyIHLB9Zzr5l-EX4_oFZiiTenmhpvOzrE5us4EQVXMfHKiKITDlMy3AKyjytatdh9WrbA/exec", {
     method: "POST",
     headers: {
       "Content-Type": "application/json"
