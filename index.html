@@ -210,26 +210,31 @@ function search() {
     const div = document.createElement('div');
     const appealed = appealedUNQ.includes(String(item.UNQ_no));
 
-    div.innerHTML = `
-      <p><strong>번호:</strong> ${item.UNQ_no}</p>
-      <p><strong>업무일자:</strong> ${item.date}</p>
-      <p><strong>업무형태:</strong> ${item.workType}</p>
-      <p><strong>캠프:</strong> ${item.camp}</p>
-      <p><strong>라우트:</strong> ${item.route}</p>
-      <div class="image-wrapper">
-        <p class="image-caption">📷 좌측은 검수 사진, 우측은 이전 배송 사진입니다</p>
-        <img src="${item.photo}" alt="사진" class="big-image">
-      </div>
-      ${appealed ? '<p class="appeal-status">📩 이의제기 접수가 완료된 건 입니다.</p>' : ''}
-      <label style="font-size: 20px;">
-        <input type="checkbox" style="transform: scale(1.5); margin-right: 10px;" onchange="toggleAppealBox(${index})" id="appealCheck${index}">
-        <strong>📌 이의제기</strong>
-      </label>
-      <div class="appealBox" id="appealBox${index}">
-        <textarea id="appealText${index}" rows="4" placeholder="이의제기 사유를 입력하세요." style="width: 100%;"></textarea>
-      </div>
-      <hr>
-    `;
+   div.innerHTML = `
+     <p><strong>번호:</strong> ${item.UNQ_no}</p>
+     <p><strong>업무일자:</strong> ${item.date}</p>
+     <p><strong>업무형태:</strong> ${item.workType}</p>
+     <p><strong>캠프:</strong> ${item.camp}</p>
+     <p><strong>라우트:</strong> ${item.route}</p>
+   <div class="image-wrapper">
+       <p class="image-caption">📷 좌측은 검수 사진, 우측은 이전 배송 사진입니다</p>
+       <img src="${item.photo}" alt="사진" class="big-image">
+  </div>
+  ${appealed ? '<p class="appeal-status">📩 이의제기 접수가 완료된 건 입니다.</p>' : ''}
+  <label style="font-size: 20px;">
+    <input type="checkbox"
+           ${appealed ? 'disabled' : ''}
+           style="transform: scale(1.5); margin-right: 10px; ${appealed ? 'opacity: 0.5;' : ''}"
+           onchange="toggleAppealBox(${index})"
+           id="appealCheck${index}">
+    <strong>📌 이의제기</strong>
+  </label>
+  <div class="appealBox" id="appealBox${index}" ${appealed ? 'style="display: none;"' : ''}>
+    <textarea id="appealText${index}" rows="4" placeholder="이의제기 사유를 입력하세요." style="width: 100%;" ${appealed ? 'disabled' : ''}></textarea>
+  </div>
+  <hr>
+`;
+
     resultDiv.appendChild(div);
   });
 }
