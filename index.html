@@ -31,7 +31,7 @@
       text-align: left;
     }
     img.big-image {
-      width: 1257px;
+      max-width: 100%;
       height: auto;
       display: block;
       margin-top: 10px;
@@ -165,11 +165,13 @@ let data = [];
 let appealedUNQ = [];
 let searchResults = [];
 
+// 1. JSON 데이터 로드
 fetch('data_updated.json')
   .then(res => res.json())
   .then(json => data = json)
   .catch(err => console.error("데이터 불러오기 실패:", err));
 
+// 2. Google Apps Script 에서 이의제기 목록 가져오기
 fetch("https://script.google.com/macros/s/AKfycbyIHLB9Zzr5l-EX4_oFZiiTenmhpvOzrE5us4EQVXMfHKiKITDlMy3AKyjytatdh9WrbA/exec")
   .then(res => res.json())
   .then(json => {
@@ -189,6 +191,7 @@ function search() {
   );
 
   searchResults = filtered;
+
   const resultDiv = document.getElementById('result');
   resultDiv.innerHTML = "";
   document.getElementById('submissionSection').style.display = "none";
@@ -270,6 +273,7 @@ function submitAppeals() {
 
   fetch("https://script.google.com/macros/s/AKfycbyIHLB9Zzr5l-EX4_oFZiiTenmhpvOzrE5us4EQVXMfHKiKITDlMy3AKyjytatdh9WrbA/exec", {
     method: "POST",
+    mode: "no-cors",
     headers: {
       "Content-Type": "application/json"
     },
@@ -286,6 +290,5 @@ function submitAppeals() {
   });
 }
 </script>
-
 </body>
 </html>
