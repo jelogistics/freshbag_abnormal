@@ -30,11 +30,6 @@
       border-radius: 8px;
       text-align: left;
     }
-    img {
-      max-width: 100%;
-      height: auto;
-      border-radius: 5px;
-    }
     img.big-image {
       width: 1257px;
       height: auto;
@@ -45,6 +40,11 @@
     .appealBox {
       display: none;
       margin-top: 10px;
+    }
+    .appeal-status {
+      font-weight: bold;
+      color: green;
+      margin-top: 5px;
     }
   </style>
 </head>
@@ -162,16 +162,25 @@
 
 <script>
 let data = [];
-let searchResults = [];
+let appealedUNQ = [];
 
+// 1. 데이터 로드
 fetch('data_updated.json')
   .then(res => res.json())
   .then(json => data = json)
   .catch(err => console.error("데이터 불러오기 실패:", err));
 
+// 2. 이의제기된 목록 가져오기
+fetch("https://script.google.com/macros/s/AKfycbxFfFEwS_KqGkVxjnQ1MYND33F4c20brZVd8HYGZzOJ74E0gHkFUM-uiiXS7i881DF6ww/exec")
+  .then(res => res.json())
+  .then(json => {
+    appealedUNQ = json.appealed || [];
+  })
+  .catch(err => console.error("이의제기 목록 불러오기 실패:", err));
+
 function search() {
   const workType = document.getElementById('workType').value;
-  const camp = document.getElementById('camp').value;
+  const camp = document.getElementById('camp').value.trim();
   const route = document.getElementById('route').value.trim();
 
   const filtered = data.filter(item =>
@@ -181,24 +190,28 @@ function search() {
   );
 
   searchResults = filtered;
-
+  
   const resultDiv = document.getElementById('result');
   resultDiv.innerHTML = "";
   document.getElementById('submissionSection').style.display = "none";
 
   if (filtered.length === 0) {
-    resultDiv.innerHTML = "<p>검색 결과가 없습니다.</p>";
+    resultDiv.innerHTML = "p>검색 결과가 없습니다.</p>";
     return;
   }
 
-  filtered.forEach((item, index) => {
+  filtered.forEach(item => {
     const div = document.createElement('div');
+    const appealed = appealedUNQ.includes(String(item.UNQ_no));
+
     div.innerHTML = `
+      <p><strong>번호:</strong> ${item.UNQ_no}</p>
       <p><strong>업무일자:</strong> ${item.date}</p>
       <p><strong>업무형태:</strong> ${item.workType}</p>
       <p><strong>캠프:</strong> ${item.camp}</p>
       <p><strong>라우트:</strong> ${item.route}</p>
       <img src="${item.photo}" alt="사진" class="big-image">
+      ${appealed ? '<p class="appeal-status">📩 이의제기 접수 완료</p>' : ''}
       <label style="font-size: 18px;">
         <input type="checkbox" style="transform: scale(1.5); margin-right: 10px;" onchange="toggleAppealBox(${index})" id="appealCheck${index}">
         <strong>📌 이의제기</strong>
