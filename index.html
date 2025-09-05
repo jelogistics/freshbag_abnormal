@@ -3,6 +3,23 @@
 <head>
   <meta charset="UTF-8">
   <title>프레시백 미회수 검수 사진 확인</title>
+
+  <!-- Open Graph (카카오톡/페북 미리보기용) -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="프레시백 미회수 검수 사진 확인">
+  <meta property="og:description" content="캠프·라우트별 미회수 검수 사진 확인 및 이의제기">
+  <meta property="og:url" content="https://jelogistics.github.io/jelogistics/">
+  <meta property="og:image" content="https://jelogistics.github.io/jelogistics/og-image.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:locale" content="ko_KR">
+
+  <!-- Twitter Card (참고용) -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="프레시백 미회수 검수 사진 확인">
+  <meta name="twitter:description" content="캠프·라우트별 미회수 검수 사진과 이의제기 현황을 확인할 수 있습니다.">
+  <meta name="twitter:image" content="https://jelogistics.github.io/jelogistics/og-image.png">
+
   <style>
     body {
       font-family: sans-serif;
@@ -170,13 +187,13 @@ let data = [];
 let appealedUNQ = [];
 let searchResults = [];
 
-// 1. JSON 데이터 로드
+// JSON 데이터 로드
 fetch('data_updated.json')
   .then(res => res.json())
   .then(json => data = json)
   .catch(err => console.error("데이터 불러오기 실패:", err));
 
-// 2. Google Apps Script 에서 이의제기 목록 가져오기
+// Google Apps Script에서 이의제기 목록 가져오기
 fetch("https://script.google.com/macros/s/AKfycbyIHLB9Zzr5l-EX4_oFZiiTenmhpvOzrE5us4EQVXMfHKiKITDlMy3AKyjytatdh9WrbA/exec")
   .then(res => res.json())
   .then(json => {
@@ -210,30 +227,30 @@ function search() {
     const div = document.createElement('div');
     const appealed = appealedUNQ.includes(String(item.UNQ_no));
 
-   div.innerHTML = `
-     <p><strong>번호:</strong> ${item.UNQ_no}</p>
-     <p><strong>업무일자:</strong> ${item.date}</p>
-     <p><strong>업무형태:</strong> ${item.workType}</p>
-     <p><strong>캠프:</strong> ${item.camp}</p>
-     <p><strong>라우트:</strong> ${item.route}</p>
-   <div class="image-wrapper">
-       <p class="image-caption">📷 좌측은 검수 사진, 우측은 이전 배송 사진입니다</p>
-       <img src="${item.photo}" alt="사진" class="big-image">
-  </div>
-  ${appealed ? '<p class="appeal-status">📩 이의제기 접수가 완료된 건 입니다.</p>' : ''}
-  <label style="font-size: 20px;">
-    <input type="checkbox"
-           ${appealed ? 'disabled' : ''}
-           style="transform: scale(1.5); margin-right: 10px; ${appealed ? 'opacity: 0.5;' : ''}"
-           onchange="toggleAppealBox(${index})"
-           id="appealCheck${index}">
-    <strong>📌 이의제기</strong>
-  </label>
-  <div class="appealBox" id="appealBox${index}" ${appealed ? 'style="display: none;"' : ''}>
-    <textarea id="appealText${index}" rows="4" placeholder="이의제기 사유를 입력하세요." style="width: 100%;" ${appealed ? 'disabled' : ''}></textarea>
-  </div>
-  <hr>
-`;
+    div.innerHTML = `
+      <p><strong>번호:</strong> ${item.UNQ_no}</p>
+      <p><strong>업무일자:</strong> ${item.date}</p>
+      <p><strong>업무형태:</strong> ${item.workType}</p>
+      <p><strong>캠프:</strong> ${item.camp}</p>
+      <p><strong>라우트:</strong> ${item.route}</p>
+      <div class="image-wrapper">
+        <p class="image-caption">📷 좌측은 검수 사진, 우측은 이전 배송 사진입니다</p>
+        <img src="${item.photo}" alt="사진" class="big-image">
+      </div>
+      ${appealed ? '<p class="appeal-status">📩 이의제기 접수가 완료된 건 입니다.</p>' : ''}
+      <label style="font-size: 20px;">
+        <input type="checkbox"
+               ${appealed ? 'disabled' : ''}
+               style="transform: scale(1.5); margin-right: 10px; ${appealed ? 'opacity: 0.5;' : ''}"
+               onchange="toggleAppealBox(${index})"
+               id="appealCheck${index}">
+        <strong>📌 이의제기</strong>
+      </label>
+      <div class="appealBox" id="appealBox${index}" ${appealed ? 'style="display: none;"' : ''}>
+        <textarea id="appealText${index}" rows="4" placeholder="이의제기 사유를 입력하세요." style="width: 100%;" ${appealed ? 'disabled' : ''}></textarea>
+      </div>
+      <hr>
+    `;
 
     resultDiv.appendChild(div);
   });
